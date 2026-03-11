@@ -1,31 +1,140 @@
 # MERN EMR Appointment System — Backend (API)
+
 Node/Express + MongoDB backend for EMR appointment scheduling.
-- **Frontend repo**: [EMR-Appointment-System---Frontend](https://github.com/Annan-Andrews/EMR-Appointment-System---Frontend)
-## Tech stack
-Node.js, Express, MongoDB (Mongoose), JWT (access + refresh), bcrypt, express-validator, Helmet, CORS
+
+**Frontend Repository:**
+[https://github.com/Annan-Andrews/EMR-Appointment-System---Frontend](https://github.com/Annan-Andrews/EMR-Appointment-System---Frontend)
+
 ---
-## Architecture (folder structure)
-- `src/app.js` — Express app (helmet, cors, cookies, routes, error handlers)
-- `src/routes/*` — route definitions
-- `src/controllers/*` — request handlers
-- `src/models/*` — Mongoose models (User, Patient, Appointment, DoctorSchedule, AuditLog)
-- `src/middleware/*`
-  - `authMiddleware` — verifies access token (Bearer)
-  - `rbacMiddleware` — role authorization
-  - `errorMiddleware` — 404 + consistent error responses
-- `src/utils/*` — response helpers, token helpers, audit logging
-## Auth design (important)
-- **Access token**: short-lived (default **15m**)
-- **Refresh token**: long-lived (default **7d**)
-- Refresh token is stored in a **httpOnly cookie** named `refreshToken`
-- Refresh token rotates on `/auth/refresh` and is stored on the user record (`User.refreshToken`)
-## Concurrency / double-booking protection
-- Double-booking is prevented at the database level using a unique index on:
-  `(doctorId, slotDate, slotStart)` for non-cancelled appointments.
-- If two users book the same slot simultaneously, one succeeds and the other receives **409 Conflict**.
+
+# Tech Stack
+
+* Node.js
+* Express
+* MongoDB (Mongoose)
+* JWT (Access Token + Refresh Token)
+* bcrypt
+* express-validator
+* Helmet
+* CORS
+
 ---
-## Environment variables
-Create `./.env` (use `.env.example` as template):
+
+# Architecture (Folder Structure)
+
+```
+src
+ ├ app.js
+ ├ routes
+ ├ controllers
+ ├ models
+ ├ middleware
+ └ utils
+```
+
+### src/app.js
+
+Express application setup including:
+
+* Helmet
+* CORS
+* Cookie parser
+* Routes
+* Error handlers
+
+### src/routes/*
+
+Defines API route endpoints.
+
+### src/controllers/*
+
+Handles request processing and business logic.
+
+### src/models/*
+
+Mongoose models:
+
+* User
+* Patient
+* Appointment
+* DoctorSchedule
+* AuditLog
+
+### src/middleware/*
+
+**authMiddleware**
+Verifies access token (`Authorization: Bearer <token>`)
+
+**rbacMiddleware**
+Handles role-based authorization.
+
+**errorMiddleware**
+Handles 404 responses and standardized API error responses.
+
+### src/utils/*
+
+Helper utilities including:
+
+* Response helpers
+* Token helpers
+* Audit logging utilities
+
+---
+
+# Auth Design (Important)
+
+### Access Token
+
+* Short-lived token
+* Default expiration: **15 minutes**
+
+### Refresh Token
+
+* Long-lived token
+* Default expiration: **7 days**
+
+### Storage Strategy
+
+* Refresh token is stored in an **httpOnly cookie** named `refreshToken`.
+* Token rotation occurs on:
+
+```
+POST /auth/refresh
+```
+
+* The refresh token is also stored in the database on the user record:
+
+```
+User.refreshToken
+```
+
+---
+
+# Concurrency / Double Booking Protection
+
+Double booking is prevented at the **database level** using a unique compound index on:
+
+```
+(doctorId, slotDate, slotStart)
+```
+
+for appointments where status is not cancelled.
+
+If two users attempt to book the same slot simultaneously:
+
+* One request succeeds
+* The other receives:
+
+```
+409 Conflict
+```
+
+---
+
+# Environment Variables
+
+Create a `.env` file in the project root (use `.env.example` as a template).
+
 ```env
 PORT=5000
 NODE_ENV=development
@@ -36,13 +145,41 @@ JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 CLIENT_URL=http://localhost:5173
 ```
-Local setup
-1) Install dependencies
-npm install
-2) Run in development (nodemon)
-npm run dev
-3) Run in production mode
-npm start
-Health check:
 
+---
+
+# Local Setup
+
+## 1) Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 2) Run in Development Mode
+
+```bash
+npm run dev
+```
+
+Uses **nodemon** for automatic server restart.
+
+---
+
+## 3) Run in Production Mode
+
+```bash
+npm start
+```
+
+---
+
+# Health Check
+
+Endpoint to verify the API server is running.
+
+```
 GET /health
+```
