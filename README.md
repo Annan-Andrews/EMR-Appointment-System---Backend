@@ -35,6 +35,7 @@ JWT_REFRESH_SECRET=
 JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 CLIENT_URL=http://localhost:5173
+```
 Local setup
 1) Install dependencies
 npm install
