@@ -1,4 +1,3 @@
-```md
 # MERN EMR Appointment System — Backend (API)
 Node/Express + MongoDB backend for EMR appointment scheduling.
 - **Frontend repo**: [EMR-Appointment-System---Frontend](https://github.com/Annan-Andrews/EMR-Appointment-System---Frontend)
